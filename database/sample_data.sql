@@ -1,32 +1,32 @@
--- Personal Finance Tracker Database Schema
+-- Sample data for Personal Finance Tracker
 
-CREATE DATABASE IF NOT EXISTS finance_tracker;
 USE finance_tracker;
 
--- Categories Table
-CREATE TABLE categories (
-    category_id INT PRIMARY KEY AUTO_INCREMENT,
-    category_name VARCHAR(50) NOT NULL,
-    category_type ENUM('income', 'expense') NOT NULL
-);
+-- Insert Categories
+INSERT INTO categories (category_name, category_type) VALUES
+('Salary', 'income'),
+('Freelance', 'income'),
+('Food', 'expense'),
+('Transport', 'expense'),
+('Entertainment', 'expense'),
+('Utilities', 'expense'),
+('Rent', 'expense'),
+('Investments', 'income');
 
--- Transactions Table
-CREATE TABLE transactions (
-    transaction_id INT PRIMARY KEY AUTO_INCREMENT,
-    amount DECIMAL(10,2) NOT NULL,
-    description VARCHAR(255),
-    transaction_date DATE NOT NULL,
-    category_id INT,
-    transaction_type ENUM('income', 'expense') NOT NULL,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (category_id) REFERENCES categories(category_id)
-);
+-- Insert Sample Transactions
+INSERT INTO transactions (amount, description, transaction_date, category_id, transaction_type) VALUES
+(3000.00, 'Monthly Salary', '2024-01-01', 1, 'income'),
+(150.00, 'Grocery Shopping', '2024-01-02', 3, 'expense'),
+(50.00, 'Gas', '2024-01-03', 4, 'expense'),
+(500.00, 'Website Project', '2024-01-05', 2, 'income'),
+(75.00, 'Dinner with friends', '2024-01-06', 3, 'expense'),
+(30.00, 'Bus pass', '2024-01-07', 4, 'expense'),
+(1200.00, 'Apartment Rent', '2024-01-01', 7, 'expense'),
+(300.00, 'Stock Dividends', '2024-01-10', 8, 'income');
 
--- Budgets Table
-CREATE TABLE budgets (
-    budget_id INT PRIMARY KEY AUTO_INCREMENT,
-    category_id INT NOT NULL,
-    budget_amount DECIMAL(10,2) NOT NULL,
-    budget_month DATE NOT NULL,
-    FOREIGN KEY (category_id) REFERENCES categories(category_id)
-);
+-- Insert Sample Budgets
+INSERT INTO budgets (category_id, budget_amount, budget_month) VALUES
+(3, 400.00, '2024-01-01'),  
+(4, 200.00, '2024-01-01'),  
+(5, 100.00, '2024-01-01'),  
+(6, 150.00, '2024-01-01');  
