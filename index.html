@@ -1,0 +1,582 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Personal Finance Tracker</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        header {
+            background: linear-gradient(135deg, #2c3e50, #34495e);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+
+        .subtitle {
+            font-size: 1.2em;
+            opacity: 0.9;
+        }
+
+        .main-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            padding: 30px;
+        }
+
+        @media (max-width: 768px) {
+            .main-content {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .form-section, .data-section {
+            background: #f8f9fa;
+            padding: 25px;
+            border-radius: 10px;
+            border: 1px solid #e9ecef;
+        }
+
+        h2 {
+            color: #2c3e50;
+            margin-bottom: 20px;
+            font-size: 1.5em;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #495057;
+        }
+
+        input, select, textarea {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e9ecef;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+
+        input:focus, select:focus, textarea:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        button {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s;
+            width: 100%;
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        .stat-value {
+            font-size: 1.8em;
+            font-weight: bold;
+            color: #2c3e50;
+        }
+
+        .stat-label {
+            color: #6c757d;
+            font-size: 0.9em;
+        }
+
+        .income { color: #27ae60; }
+        .expense { color: #e74c3c; }
+        .savings { color: #3498db; }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+            background: white;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        th, td {
+            padding: 15px;
+            text-align: left;
+            border-bottom: 1px solid #e9ecef;
+        }
+
+        th {
+            background: #34495e;
+            color: white;
+            font-weight: 600;
+        }
+
+        tr:hover {
+            background: #f8f9fa;
+        }
+
+        .alert {
+            padding: 15px;
+            border-radius: 8px;
+            margin: 15px 0;
+            text-align: center;
+            font-weight: 600;
+        }
+
+        .success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>💰 Personal Finance Tracker</h1>
+            <p class="subtitle">Track your income and expenses effortlessly</p>
+        </header>
+
+        <div class="main-content">
+            <!-- Left Column: Forms -->
+            <div class="form-section">
+                <h2>Add Transaction</h2>
+                <div id="alert"></div>
+                
+                <form id="transactionForm">
+                    <div class="form-group">
+                        <label for="amount">Amount ($)</label>
+                        <input type="number" id="amount" step="0.01" min="0" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="description">Description</label>
+                        <input type="text" id="description" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="transactionType">Type</label>
+                        <select id="transactionType" required>
+                            <option value="">Select Type</option>
+                            <option value="Income">Income</option>
+                            <option value="Expense">Expense</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="category">Category</label>
+                        <select id="category" required>
+                            <option value="">Select Category</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="date">Date</label>
+                        <input type="date" id="date" required>
+                    </div>
+
+                    <button type="submit">Add Transaction</button>
+                </form>
+
+                <div style="margin-top: 30px;">
+                    <h2>Set Monthly Budget</h2>
+                    <form id="budgetForm">
+                        <div class="form-group">
+                            <label for="budgetCategory">Category</label>
+                            <select id="budgetCategory" required>
+                                <option value="">Select Category</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="budgetAmount">Budget Amount ($)</label>
+                            <input type="number" id="budgetAmount" step="0.01" min="0" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="budgetMonth">Month</label>
+                            <input type="month" id="budgetMonth" required>
+                        </div>
+
+                        <button type="submit">Set Budget</button>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Right Column: Data Display -->
+            <div class="data-section">
+                <h2>Financial Overview</h2>
+                
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-value income" id="totalIncome">$0.00</div>
+                        <div class="stat-label">Total Income</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value expense" id="totalExpense">$0.00</div>
+                        <div class="stat-label">Total Expenses</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value savings" id="netSavings">$0.00</div>
+                        <div class="stat-label">Net Savings</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="transactionsCount">0</div>
+                        <div class="stat-label">Transactions</div>
+                    </div>
+                </div>
+
+                <h2 style="margin-top: 30px;">Recent Transactions</h2>
+                <div id="transactionsTable">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Date</th>
+                                <th>Description</th>
+                                <th>Category</th>
+                                <th>Type</th>
+                                <th>Amount</th>
+                            </tr>
+                        </thead>
+                        <tbody id="transactionsBody">
+                            <!-- Transactions will be loaded here -->
+                        </tbody>
+                    </table>
+                </div>
+
+                <h2 style="margin-top: 30px;">Budget vs Actual</h2>
+                <div id="budgetTable">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Category</th>
+                                <th>Budget</th>
+                                <th>Actual</th>
+                                <th>Difference</th>
+                            </tr>
+                        </thead>
+                        <tbody id="budgetBody">
+                            <!-- Budget data will be loaded here -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Sample data - In real app, this would come from backend API
+        const categories = [
+            { id: 1, name: 'Salary', type: 'Income' },
+            { id: 2, name: 'Freelance', type: 'Income' },
+            { id: 3, name: 'Food & Dining', type: 'Expense' },
+            { id: 4, name: 'Transportation', type: 'Expense' },
+            { id: 5, name: 'Entertainment', type: 'Expense' },
+            { id: 6, name: 'Utilities', type: 'Expense' },
+            { id: 7, name: 'Shopping', type: 'Expense' }
+        ];
+
+        let transactions = [];
+        let budgets = [];
+
+        // Initialize the app
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeCategories();
+            loadSampleData();
+            updateUI();
+            
+            // Set today's date as default
+            document.getElementById('date').valueAsDate = new Date();
+            document.getElementById('budgetMonth').value = new Date().toISOString().slice(0, 7);
+        });
+
+        // Initialize category dropdowns
+        function initializeCategories() {
+            const categorySelect = document.getElementById('category');
+            const budgetCategorySelect = document.getElementById('budgetCategory');
+            
+            categories.forEach(category => {
+                if (category.type === 'Expense') { // Only expenses can have budgets
+                    const budgetOption = new Option(category.name, category.id);
+                    budgetCategorySelect.add(budgetOption);
+                }
+                
+                const option = new Option(category.name, category.id);
+                categorySelect.add(option);
+            });
+        }
+
+        // Update category options based on transaction type
+        document.getElementById('transactionType').addEventListener('change', function() {
+            const type = this.value;
+            const categorySelect = document.getElementById('category');
+            
+            // Clear existing options
+            categorySelect.innerHTML = '<option value="">Select Category</option>';
+            
+            // Add filtered categories
+            categories.filter(cat => cat.type === type).forEach(category => {
+                const option = new Option(category.name, category.id);
+                categorySelect.add(option);
+            });
+        });
+
+        // Handle transaction form submission
+        document.getElementById('transactionForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const transaction = {
+                amount: parseFloat(document.getElementById('amount').value),
+                description: document.getElementById('description').value,
+                transaction_type: document.getElementById('transactionType').value,
+                category_id: parseInt(document.getElementById('category').value),
+                transaction_date: document.getElementById('date').value
+            };
+
+            // In real app: Send to backend API
+            // fetch('/api/transactions', { method: 'POST', body: JSON.stringify(transaction) })
+            
+            // For demo: Add to local array
+            transactions.push({
+                ...transaction,
+                id: Date.now(),
+                category_name: categories.find(c => c.id === transaction.category_id)?.name || 'Unknown'
+            });
+
+            showAlert('Transaction added successfully!', 'success');
+            this.reset();
+            document.getElementById('date').valueAsDate = new Date();
+            updateUI();
+        });
+
+        // Handle budget form submission
+        document.getElementById('budgetForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const budget = {
+                category_id: parseInt(document.getElementById('budgetCategory').value),
+                budget_amount: parseFloat(document.getElementById('budgetAmount').value),
+                budget_month: document.getElementById('budgetMonth').value + '-01'
+            };
+
+            // In real app: Send to backend API
+            // fetch('/api/budgets', { method: 'POST', body: JSON.stringify(budget) })
+            
+            // For demo: Add to local array
+            const existingIndex = budgets.findIndex(b => 
+                b.category_id === budget.category_id && 
+                b.budget_month === budget.budget_month
+            );
+
+            if (existingIndex >= 0) {
+                budgets[existingIndex] = { ...budget, id: budgets[existingIndex].id };
+            } else {
+                budgets.push({
+                    ...budget,
+                    id: Date.now(),
+                    category_name: categories.find(c => c.id === budget.category_id)?.name || 'Unknown'
+                });
+            }
+
+            showAlert('Budget set successfully!', 'success');
+            this.reset();
+            document.getElementById('budgetMonth').value = new Date().toISOString().slice(0, 7);
+            updateUI();
+        });
+
+        // Update UI with current data
+        function updateUI() {
+            updateFinancialOverview();
+            updateTransactionsTable();
+            updateBudgetTable();
+        }
+
+        function updateFinancialOverview() {
+            const totalIncome = transactions
+                .filter(t => t.transaction_type === 'Income')
+                .reduce((sum, t) => sum + t.amount, 0);
+
+            const totalExpense = transactions
+                .filter(t => t.transaction_type === 'Expense')
+                .reduce((sum, t) => sum + t.amount, 0);
+
+            document.getElementById('totalIncome').textContent = `$${totalIncome.toFixed(2)}`;
+            document.getElementById('totalExpense').textContent = `$${totalExpense.toFixed(2)}`;
+            document.getElementById('netSavings').textContent = `$${(totalIncome - totalExpense).toFixed(2)}`;
+            document.getElementById('transactionsCount').textContent = transactions.length;
+        }
+
+        function updateTransactionsTable() {
+            const tbody = document.getElementById('transactionsBody');
+            tbody.innerHTML = '';
+
+            // Show latest 10 transactions
+            const recentTransactions = [...transactions]
+                .sort((a, b) => new Date(b.transaction_date) - new Date(a.transaction_date))
+                .slice(0, 10);
+
+            recentTransactions.forEach(transaction => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${formatDate(transaction.transaction_date)}</td>
+                    <td>${transaction.description}</td>
+                    <td>${transaction.category_name}</td>
+                    <td><span class="${transaction.transaction_type.toLowerCase()}">${transaction.transaction_type}</span></td>
+                    <td>$${transaction.amount.toFixed(2)}</td>
+                `;
+                tbody.appendChild(row);
+            });
+        }
+
+        function updateBudgetTable() {
+            const tbody = document.getElementById('budgetBody');
+            tbody.innerHTML = '';
+
+            const currentMonth = new Date().toISOString().slice(0, 7) + '-01';
+
+            budgets.filter(b => b.budget_month === currentMonth).forEach(budget => {
+                const actualSpending = transactions
+                    .filter(t => t.category_id === budget.category_id && 
+                                 t.transaction_type === 'Expense' &&
+                                 t.transaction_date.startsWith(currentMonth.slice(0, 7)))
+                    .reduce((sum, t) => sum + t.amount, 0);
+
+                const difference = budget.budget_amount - actualSpending;
+
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${budget.category_name}</td>
+                    <td>$${budget.budget_amount.toFixed(2)}</td>
+                    <td>$${actualSpending.toFixed(2)}</td>
+                    <td class="${difference >= 0 ? 'income' : 'expense'}">$${Math.abs(difference).toFixed(2)} ${difference >= 0 ? 'under' : 'over'}</td>
+                `;
+                tbody.appendChild(row);
+            });
+        }
+
+        function showAlert(message, type) {
+            const alertDiv = document.getElementById('alert');
+            alertDiv.className = `alert ${type}`;
+            alertDiv.textContent = message;
+            
+            setTimeout(() => {
+                alertDiv.className = 'alert';
+                alertDiv.textContent = '';
+            }, 3000);
+        }
+
+        function formatDate(dateString) {
+            return new Date(dateString).toLocaleDateString();
+        }
+
+        // Load sample data for demo
+        function loadSampleData() {
+            transactions = [
+                {
+                    id: 1,
+                    amount: 3000,
+                    description: 'Monthly Salary',
+                    transaction_date: '2024-01-01',
+                    category_id: 1,
+                    transaction_type: 'Income',
+                    category_name: 'Salary'
+                },
+                {
+                    id: 2,
+                    amount: 150.50,
+                    description: 'Grocery Shopping',
+                    transaction_date: '2024-01-02',
+                    category_id: 3,
+                    transaction_type: 'Expense',
+                    category_name: 'Food & Dining'
+                },
+                {
+                    id: 3,
+                    amount: 45.00,
+                    description: 'Gas',
+                    transaction_date: '2024-01-03',
+                    category_id: 4,
+                    transaction_type: 'Expense',
+                    category_name: 'Transportation'
+                }
+            ];
+
+            budgets = [
+                {
+                    id: 1,
+                    category_id: 3,
+                    budget_amount: 400,
+                    budget_month: '2024-01-01',
+                    category_name: 'Food & Dining'
+                },
+                {
+                    id: 2,
+                    category_id: 4,
+                    budget_amount: 200,
+                    budget_month: '2024-01-01',
+                    category_name: 'Transportation'
+                }
+            ];
+        }
+    </script>
+</body>
+</html>
